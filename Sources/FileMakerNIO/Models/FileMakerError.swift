@@ -1,6 +1,8 @@
-import Foundation
-import AsyncHTTPClient
+//
+//  File.swift
+//  
+//
+//  Created by Tim Condon on 08/04/2020.
+//
 
-struct FileMakerError: Error {
-    let message: String
-}
+import Foundation

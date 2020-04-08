@@ -35,4 +35,11 @@ public extension FileMakerNIO {
             return try self.validateAndGetResponse(response, type: CreateRecordResponse.self, action: "create record")
         }
     }
+    
+    func editRecord<T>(_ id: Int, layout: String, data: T, modID: Int?) -> EventLoopFuture<EditRecordResponse> where T: Encodable {
+        let url = "https://\(self.configuration.hostname)/fmi/data/v1/databases/\(self.configuration.databaseName)/layouts/\(layout)/records/\(id)"
+        return self.performOperation(url: url, data: data).flatMapThrowing { response in
+            return try self.validateAndGetResponse(response, type: EditRecordResponse.self, action: "edit record")
+        }
+    }
 }

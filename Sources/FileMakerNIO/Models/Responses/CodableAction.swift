@@ -1,5 +1,7 @@
 import Foundation
+import NIOHTTP1
 
-public protocol CodableAction: Codable {
+protocol CodableAction: Codable {
     static var action: String { get }
+    static var method: HTTPMethod { get }
 }

@@ -4,9 +4,13 @@ import NIO
 import Foundation
 
 extension HTTPClient: Client {
-    public func sendRequest(to url: String, method: HTTPMethod) -> EventLoopFuture<Response> {
+    
+    public func sendRequest(to url: String, method: HTTPMethod, sessionToken: String?) -> EventLoopFuture<Response> {
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
+        if let token = sessionToken {
+            headers.add(name: "authorization", value: "Bearer \(token)")
+        }
         let request: HTTPClient.Request
         do {
             request = try HTTPClient.Request(url: url, method: method, headers: headers)

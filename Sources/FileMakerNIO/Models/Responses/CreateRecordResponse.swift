@@ -1,10 +1,7 @@
 import Foundation
 
-struct CreateRecordResponseContainer: Codable {
-    let response:  CreateRecordResponse
-}
-
-public struct CreateRecordResponse: Codable {
-    let recordId: String
-    let modId: String
+public struct CreateRecordResponse: CodableAction {
+    public static let action = "create record"
+    public let recordId: String
+    public let modId: String
 }

@@ -1,5 +1,6 @@
 import Foundation
 
-public struct EditRecordResponse: Codable {
-    let modId: String
+public struct EditRecordResponse: CodableAction {
+    public static let action = "edit record"
+    public let modId: String
 }

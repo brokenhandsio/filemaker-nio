@@ -48,5 +48,12 @@ public extension FileMakerNIO {
             getRangeOfRecordsResponse.data
         }
     }
+    
+    func findRecords<T, R>(layout: String, payload:T, decodeTo type: R) -> EventLoopFuture<[R]> where T: Codable, R: Codable {
+        let url = "https://\(self.configuration.hostname)/fmi/data/version/databases/\(self.configuration.databaseName)/layouts/\(layout)/_find"
+        return self.performOperation(url: url, data: payload, type: FindRecordsResponse<R>.self).map { findResponse in
+            findResponse.data
+        }
+    }
 }
 

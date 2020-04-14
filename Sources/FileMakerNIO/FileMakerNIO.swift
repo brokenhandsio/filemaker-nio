@@ -19,14 +19,14 @@ public class FileMakerNIO {
         return token
     }
     
-    func start() -> EventLoopFuture<Void> {
+    public func start() -> EventLoopFuture<Void> {
         let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration)
         return authentication.login().map { loginResponse in
             self.token = loginResponse.response.token
         }
     }
     
-    func stop() -> EventLoopFuture<Void> {
+    public func stop() -> EventLoopFuture<Void> {
         let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration)
         let token: String
         do {

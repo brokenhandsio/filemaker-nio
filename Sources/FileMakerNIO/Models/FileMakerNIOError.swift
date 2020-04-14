@@ -1,6 +1,6 @@
 import Foundation
 import AsyncHTTPClient
 
-struct FileMakerNIOError: Error {
-    let message: String
+public struct FileMakerNIOError: Error {
+    public let message: String
 }

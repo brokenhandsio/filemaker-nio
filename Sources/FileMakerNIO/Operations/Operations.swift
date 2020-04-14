@@ -37,7 +37,8 @@ extension FileMakerNIO {
             throw FileMakerNIOError(message: "Invalid response from FileMaker")
         }
         guard message.code == "0" else {
-            throw FileMakerNIOError(message: "Failed to \(type.action). Error code \(message.code): \(message.message)")
+            let filemakerError = FileMakerError(errorCode: message.code, message: message.message)
+            throw filemakerError
         }
         return fmResponse.response
     }

@@ -5,7 +5,7 @@ public struct FileMakerConfiguration {
     public let password: String
     public let queryPath: String
     
-    public init(hostname: String, databaseName: String, username: String, password: String, queryPath: String = "" ) {
+    public init(hostname: String, databaseName: String, username: String, password: String, queryPath: String = "/fmi/data/v1/databases/" ) {
         self.hostname = hostname
         self.databaseName = databaseName
         self.username = username

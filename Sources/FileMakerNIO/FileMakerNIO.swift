@@ -7,6 +7,10 @@ public class FileMakerNIO {
     
     var token: String?
     
+    var apiBaseURL: String {
+        "https://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/"
+    }
+    
     public init(configuration: FileMakerConfiguration, client: Client = HTTPClient.init(eventLoopGroupProvider: .createNew)) {
         self.configuration = configuration
         self.client = client
@@ -20,14 +24,14 @@ public class FileMakerNIO {
     }
     
     public func start() -> EventLoopFuture<Void> {
-        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration)
+        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration, baseURL: self.apiBaseURL)
         return authentication.login().map { loginResponse in
             self.token = loginResponse.response.token
         }
     }
     
     public func stop() -> EventLoopFuture<Void> {
-        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration)
+        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration, baseURL: self.apiBaseURL)
         let token: String
         do {
             token = try getToken()

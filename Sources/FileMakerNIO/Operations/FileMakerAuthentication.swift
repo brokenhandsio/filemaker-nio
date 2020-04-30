@@ -5,9 +5,10 @@ struct FilemakerAuthentication {
     
     let client: Client
     let configuration: FileMakerConfiguration
+    let baseURL: String
     
     func login() -> EventLoopFuture<LoginResponse> {
-        let url = "https://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/sessions"
+        let url = "\(baseURL)sessions"
         return client.sendRequest(to: url, method: .POST, sessionToken: nil).flatMapThrowing { response in
             guard response.status == .ok else {
                 if response.status == .unauthorized {
@@ -25,7 +26,7 @@ struct FilemakerAuthentication {
     }
     
     func logout(token: String) -> EventLoopFuture<Void> {
-        let url = "https://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/sessions/\(token)"
+        let url = "\(baseURL)sessions/\(token)"
         return client.sendRequest(to: url, method: .DELETE, sessionToken: nil).flatMapThrowing { response in
             guard response.status == .ok else {
                 throw FileMakerNIOError(message: "Failed to log out of database")

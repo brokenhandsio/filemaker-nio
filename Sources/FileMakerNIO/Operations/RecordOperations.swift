@@ -9,7 +9,8 @@ public extension FileMakerNIO {
     
     func createRecord<T>(layout: String, data: T) -> EventLoopFuture<CreateRecordResponse> where T: Encodable {
         let url = "\(self.layoutsURL)\(layout)/records"
-        return self.performOperation(url: url, data: data, type: CreateRecordResponse.self)
+        let createData = CreateRecordRequest(fieldData: data)
+        return self.performOperation(url: url, data: createData, type: CreateRecordResponse.self)
     }
     
     func editRecord<T>(_ id: Int, layout: String, data: T) -> EventLoopFuture<EditRecordResponse> where T: Encodable {

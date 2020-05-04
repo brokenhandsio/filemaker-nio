@@ -16,7 +16,7 @@ struct FilemakerAuthentication {
     func login() -> EventLoopFuture<LoginResponse> {
         let url = "\(baseURL)sessions"
         logger.trace("FILEMAKERNIO - attempting login to \(url)")
-        return client.sendRequest(to: url, method: .POST, data: EmptyBody(), sessionToken: nil, logger: self.logger).flatMapThrowing { response in
+        return client.sendRequest(to: url, method: .POST, data: EmptyBody(), sessionToken: nil, basicAuth: .init(username: configuration.username, password: configuration.password), logger: self.logger).flatMapThrowing { response in
             self.logger.trace("FILEMAKERNIO - Received login response \(response)")
             guard response.status == .ok else {
                 if response.status == .unauthorized {

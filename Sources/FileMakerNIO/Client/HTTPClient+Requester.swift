@@ -21,11 +21,16 @@ extension HTTPClient: Client {
         return self.execute(request: request)
     }
     
-    public func sendRequest<T>(to url: String, method: HTTPMethod, data: T, sessionToken: String?, logger: Logger) -> EventLoopFuture<Response> where T : Encodable {
+    public func sendRequest<T>(to url: String, method: HTTPMethod, data: T, sessionToken: String?, basicAuth: BasicAuthCredentials?, logger: Logger) -> EventLoopFuture<Response> where T : Encodable {
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
         if let token = sessionToken {
             headers.add(name: "authorization", value: "Bearer \(token)")
+        }
+        if let basicAuth = basicAuth {
+            let authString = "\(basicAuth.username):\(basicAuth.password)"
+            let encoded = Data(authString.utf8).base64EncodedString()
+            headers.add(name: "authorization", value: "Basic \(encoded)")
         }
         let request: HTTPClient.Request
         do {

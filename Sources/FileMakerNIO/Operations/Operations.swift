@@ -32,14 +32,16 @@ extension FileMakerNIO {
         guard let body = response.body else {
             throw FileMakerNIOError(message: "The FileMaker response contained no data")
         }
-        let fmResponse = try JSONDecoder().decode(FileMakerResponse<T>.self, from: body)
+        let fmResponse = try JSONDecoder().decode(FileMakerResponse<EmptyRequest>.self, from: body)
         guard let message = fmResponse.messages.first else {
             throw FileMakerNIOError(message: "Invalid response from FileMaker")
         }
         guard message.code == "0" else {
+            self.logger.error("FILEMAKERNIO - received error code \(message.code) from FileMaker with message \(message.message)")
             let filemakerError = FileMakerError(errorCode: message.code, message: message.message)
             throw filemakerError
         }
-        return fmResponse.response
+        let realResponse = try JSONDecoder().decode(FileMakerResponse<T>.self, from: body)
+        return realResponse.response
     }
 }

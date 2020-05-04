@@ -1,15 +1,19 @@
 import NIO
 import Foundation
+import Logging
 
 struct FilemakerAuthentication {
     
     let client: Client
+    let logger: Logger
     let configuration: FileMakerConfiguration
     let baseURL: String
     
     func login() -> EventLoopFuture<LoginResponse> {
         let url = "\(baseURL)sessions"
+        logger.trace("FILEMAKERNIO - attempting login to \(url)")
         return client.sendRequest(to: url, method: .POST, sessionToken: nil).flatMapThrowing { response in
+            self.logger.trace("FILEMAKERNIO - Received login response \(response)")
             guard response.status == .ok else {
                 if response.status == .unauthorized {
                     throw FileMakerNIOError(message: "The username or password was incorrect")

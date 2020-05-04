@@ -1,8 +1,10 @@
 import AsyncHTTPClient
 import NIO
+import Logging
 
 public class FileMakerNIO {
     let client: Client
+    let logger: Logger
     let configuration: FileMakerConfiguration
     
     var token: String?
@@ -11,9 +13,10 @@ public class FileMakerNIO {
         "https://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/"
     }
     
-    public init(configuration: FileMakerConfiguration, client: Client = HTTPClient.init(eventLoopGroupProvider: .createNew)) {
+    public init(configuration: FileMakerConfiguration, client: Client = HTTPClient.init(eventLoopGroupProvider: .createNew), logger: Logger) {
         self.configuration = configuration
         self.client = client
+        self.logger = logger
     }
     
     func getToken() throws -> String {
@@ -24,14 +27,14 @@ public class FileMakerNIO {
     }
     
     public func start() -> EventLoopFuture<Void> {
-        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration, baseURL: self.apiBaseURL)
+        let authentication = FilemakerAuthentication(client: self.client, logger: self.logger, configuration: self.configuration, baseURL: self.apiBaseURL)
         return authentication.login().map { loginResponse in
             self.token = loginResponse.response.token
         }
     }
     
     public func stop() -> EventLoopFuture<Void> {
-        let authentication = FilemakerAuthentication(client: self.client, configuration: self.configuration, baseURL: self.apiBaseURL)
+        let authentication = FilemakerAuthentication(client: self.client, logger: self.logger, configuration: self.configuration, baseURL: self.apiBaseURL)
         let token: String
         do {
             token = try getToken()

@@ -9,10 +9,14 @@ struct FilemakerAuthentication {
     let configuration: FileMakerConfiguration
     let baseURL: String
     
+    struct EmptyBody: Codable {
+        
+    }
+    
     func login() -> EventLoopFuture<LoginResponse> {
         let url = "\(baseURL)sessions"
         logger.trace("FILEMAKERNIO - attempting login to \(url)")
-        return client.sendRequest(to: url, method: .POST, sessionToken: nil).flatMapThrowing { response in
+        return client.sendRequest(to: url, method: .POST, data: EmptyBody(), sessionToken: nil).flatMapThrowing { response in
             self.logger.trace("FILEMAKERNIO - Received login response \(response)")
             guard response.status == .ok else {
                 if response.status == .unauthorized {

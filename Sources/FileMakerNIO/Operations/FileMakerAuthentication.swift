@@ -20,7 +20,7 @@ struct FilemakerAuthentication {
                 } else {
                     if let body = response.body {
                         let bodyString = String(decoding: body.readableBytesView, as: UTF8.self)
-                        self.logger.error("Response body: \(bodyString)")
+                        self.logger.error("FILEMAKERNIO - Login Error. Response body: \(bodyString)")
                     }
                     
                     throw FileMakerNIOError(message: "There was an error logging in")
@@ -30,6 +30,7 @@ struct FilemakerAuthentication {
                 throw FileMakerNIOError(message: "The login response contained no data")
             }
             let response = try JSONDecoder().decode(LoginResponse.self, from: body)
+            self.logger.notice("FILEMAKERNIO - Login successful")
             return response
         }
     }
@@ -40,6 +41,7 @@ struct FilemakerAuthentication {
             guard response.status == .ok else {
                 throw FileMakerNIOError(message: "Failed to log out of database")
             }
+            self.logger.info("FILEMAKERNIO - Log out successful")
         }
     }
 }

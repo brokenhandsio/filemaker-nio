@@ -36,7 +36,7 @@ struct FilemakerAuthentication {
     
     func logout(token: String) -> EventLoopFuture<Void> {
         let url = "\(baseURL)sessions/\(token)"
-        return client.sendRequest(to: url, method: .DELETE, sessionToken: nil).flatMapThrowing { response in
+        return client.sendRequest(to: url, method: .DELETE, sessionToken: nil, logger: self.logger).flatMapThrowing { response in
             guard response.status == .ok else {
                 throw FileMakerNIOError(message: "Failed to log out of database")
             }

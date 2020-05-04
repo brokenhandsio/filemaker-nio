@@ -23,7 +23,7 @@ extension FileMakerNIO {
         } catch {
             return self.client.eventLoopGroup.next().makeFailedFuture(error)
         }
-        return self.client.sendRequest(to: url, method: type.method, sessionToken: token).flatMapThrowing { response in
+        return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMapThrowing { response in
             try self.validateAndGetResponse(response, type: type)
         }
     }

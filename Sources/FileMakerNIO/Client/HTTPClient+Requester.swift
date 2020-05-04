@@ -6,7 +6,7 @@ import Logging
 
 extension HTTPClient: Client {
     
-    public func sendRequest(to url: String, method: HTTPMethod, sessionToken: String?) -> EventLoopFuture<Response> {
+    public func sendRequest(to url: String, method: HTTPMethod, sessionToken: String?, logger: Logger) -> EventLoopFuture<Response> {
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
         if let token = sessionToken {

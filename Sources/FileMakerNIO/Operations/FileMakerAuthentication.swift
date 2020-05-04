@@ -13,16 +13,10 @@ struct FilemakerAuthentication {
         let url = "\(baseURL)sessions"
         logger.trace("FILEMAKERNIO - attempting login to \(url)")
         return client.sendRequest(to: url, method: .POST, data: EmptyRequest(), sessionToken: nil, basicAuth: .init(username: configuration.username, password: configuration.password), logger: self.logger).flatMapThrowing { response in
-            self.logger.trace("FILEMAKERNIO - Received login response \(response)")
             guard response.status == .ok else {
                 if response.status == .unauthorized {
                     throw FileMakerNIOError(message: "The username or password was incorrect")
-                } else {
-                    if let body = response.body {
-                        let bodyString = String(decoding: body.readableBytesView, as: UTF8.self)
-                        self.logger.error("FILEMAKERNIO - Login Error. Response body: \(bodyString)")
-                    }
-                    
+                } else {                    
                     throw FileMakerNIOError(message: "There was an error logging in")
                 }
             }

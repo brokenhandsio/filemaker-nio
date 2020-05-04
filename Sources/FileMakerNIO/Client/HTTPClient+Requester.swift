@@ -36,10 +36,17 @@ extension HTTPClient: Client {
         do {
             let body = try JSONEncoder().encodeAsByteBuffer(data, allocator: ByteBufferAllocator())
             request = try HTTPClient.Request(url: url, method: method, headers: headers, body: Body.byteBuffer(body))
-            logger.trace("Sending request \(request)")
+            logger.trace("FILEMAKERNIO - Sending request \(request)")
         } catch {
             return self.eventLoopGroup.next().makeFailedFuture(error)
         }
-        return self.execute(request: request)
+        return self.execute(request: request).map { response in
+            logger.trace("FILEMAKERNIO - Received response \(response)")
+            if let body = response.body {
+                let bodyString = String(decoding: body.readableBytesView, as: UTF8.self)
+                logger.error("FILEMAKERNIO - Response body: \(bodyString)")
+            }
+            return response
+        }
     }
 }

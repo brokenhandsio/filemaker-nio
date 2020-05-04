@@ -10,7 +10,7 @@ public class FileMakerNIO {
     var token: String?
     
     var apiBaseURL: String {
-        "https://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/"
+        "\(configuration.scheme)://\(configuration.hostname)/fmi/data/v1/databases/\(configuration.databaseName)/"
     }
     
     public init(configuration: FileMakerConfiguration, client: Client = HTTPClient.init(eventLoopGroupProvider: .createNew), logger: Logger) {

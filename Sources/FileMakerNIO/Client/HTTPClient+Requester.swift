@@ -44,7 +44,7 @@ extension HTTPClient: Client {
             logger.trace("FILEMAKERNIO - Received response \(response)")
             if let body = response.body {
                 let bodyString = String(decoding: body.readableBytesView, as: UTF8.self)
-                logger.error("FILEMAKERNIO - Response body: \(bodyString)")
+                logger.trace("FILEMAKERNIO - Response body: \(bodyString)")
             }
             return response
         }

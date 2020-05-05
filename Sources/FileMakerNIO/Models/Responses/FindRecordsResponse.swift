@@ -7,6 +7,6 @@ public struct FindRecordsResponse<T: Codable>: CodableAction {
     static var action: String {
         "find records"
     }
-    let data: [T]
+    let data: [GetRecordData<T>]
 }
 

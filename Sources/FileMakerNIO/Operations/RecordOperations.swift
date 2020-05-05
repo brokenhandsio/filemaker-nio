@@ -22,9 +22,9 @@ public extension FileMakerNIO {
         return self.performOperation(url: url, data: data, type: EditRecordResponse.self)
     }
     
-    func duplicateRecord<T>(_ id: Int, layout: String, data: T) -> EventLoopFuture<DuplicateRecordResponse> where T: Encodable {
+    func duplicateRecord<T>(_ id: Int, layout: String, decodeTo type: T.Type) -> EventLoopFuture<DuplicateRecordResponse> where T: Encodable {
         let url = "\(self.layoutsURL)\(layout)/records/\(id)"
-        return self.performOperation(url: url, data: data, type: DuplicateRecordResponse.self)
+        return self.performOperation(url: url, data: EmptyRequest(), type: DuplicateRecordResponse.self)
     }
     
     func deleteRecord(_ id: Int, layout: String) -> EventLoopFuture<Void> {
@@ -34,8 +34,11 @@ public extension FileMakerNIO {
     
     func getRecord<T>(_ id: Int, layout: String, decodeTo type: T.Type) -> EventLoopFuture<T> where  T: Codable {
         let url = "\(self.layoutsURL)\(layout)/records/\(id)"
-        return self.performOperation(url: url, type: GetRecordResponse<T>.self).map { getRecordResponse in
-            getRecordResponse.data
+        return self.performOperation(url: url, type: GetRecordResponse<T>.self).flatMapThrowing { getRecordResponse in
+            guard let record = getRecordResponse.data.first else {
+                throw FileMakerNIOError(message: "Record does not exist when it should")
+            }
+            return record.fieldData
         }
     }
     
@@ -58,10 +61,10 @@ public extension FileMakerNIO {
         }
     }
     
-    func findRecords<T, R>(layout: String, payload:T, decodeTo type: R) -> EventLoopFuture<[R]> where T: Codable, R: Codable {
+    func findRecords<T, R>(layout: String, payload:T, decodeTo type: R.Type) -> EventLoopFuture<[R]> where T: Codable, R: Codable {
         let url = "\(self.layoutsURL)\(layout)/_find"
         return self.performOperation(url: url, data: payload, type: FindRecordsResponse<R>.self).map { findResponse in
-            findResponse.data
+            findResponse.data.map { $0.fieldData }
         }
     }
 }

@@ -8,5 +8,5 @@ struct GetRecordResponse<T: Codable>: CodableAction {
     static var action: String {
         "get record"
     }
-    let data: T
+    let data: [GetRecordData<T>]
 }

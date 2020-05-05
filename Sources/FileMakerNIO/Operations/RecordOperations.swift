@@ -7,14 +7,14 @@ public extension FileMakerNIO {
         "\(self.apiBaseURL)layouts/"
     }
     
-    func createRecord<T>(layout: String, data: T) -> EventLoopFuture<T> where T: FMIdentifiable {
+    func createRecord<T>(layout: String, data: T, on eventLoop: EventLoop) -> EventLoopFuture<T> where T: FMIdentifiable {
         let url = "\(self.layoutsURL)\(layout)/records"
         let createData = CreateRecordRequest(fieldData: data)
         return self.performOperation(url: url, data: createData, type: CreateRecordResponse.self).map { response in
             data.modId = Int(response.modId)
             data.recordId = Int(response.recordId)
             return data
-        }
+        }.hop(to: eventLoop)
     }
     
     func editRecord<T>(_ id: Int, layout: String, updateData: T) -> EventLoopFuture<EditRecordResponse> where T: Codable {

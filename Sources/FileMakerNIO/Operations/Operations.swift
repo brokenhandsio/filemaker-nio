@@ -11,8 +11,20 @@ extension FileMakerNIO {
         } catch {
             return self.client.eventLoopGroup.next().makeFailedFuture(error)
         }
-        return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMapThrowing { response in
-            try self.validateAndGetResponse(response, type: type)
+        return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMap { response in
+            guard response.status != .unauthorized else {
+                return self.start().flatMap {
+                    self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMapThrowing { response in
+                        try self.validateAndGetResponse(response, type: type)
+                    }
+                }
+            }
+            do {
+                let result = try self.validateAndGetResponse(response, type: type)
+                return self.client.eventLoopGroup.next().makeSucceededFuture(result)
+            } catch {
+                return self.client.eventLoopGroup.next().makeFailedFuture(error)
+            }
         }
     }
     
@@ -23,8 +35,20 @@ extension FileMakerNIO {
         } catch {
             return self.client.eventLoopGroup.next().makeFailedFuture(error)
         }
-        return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMapThrowing { response in
-            try self.validateAndGetResponse(response, type: type)
+        return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMap { response in
+            guard response.status != .unauthorized else {
+                return self.start().flatMap {
+                    self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMapThrowing { response in
+                        try self.validateAndGetResponse(response, type: type)
+                    }
+                }
+            }
+            do {
+                let result = try self.validateAndGetResponse(response, type: type)
+                return self.client.eventLoopGroup.next().makeSucceededFuture(result)
+            } catch {
+                return self.client.eventLoopGroup.next().makeFailedFuture(error)
+            }
         }
     }
     

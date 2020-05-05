@@ -28,14 +28,14 @@ public final class FMInt: Codable {
         }
     }
     
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.singleValueContainer()
-//        try container.encode(self.wrappedValue)
-//    }
-//
-//    public func decode(from decoder: Decoder) throws {
-//        let container = try decoder.singleValueContainer()
-//        self.wrappedValue = try container.decode(Int.self)
-//    }
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.wrappedValue)
+    }
+
+    public func decode(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.wrappedValue = try container.decode(Int.self)
+    }
 }
 

@@ -7,22 +7,21 @@ import Logging
 extension HTTPClient: Client {
     
     public func sendRequest(to url: String, method: HTTPMethod, sessionToken: String?, logger: Logger) -> EventLoopFuture<Response> {
-        logger.trace("FILEMAKERNIO - will send request to \(url)")
-        var headers = HTTPHeaders()
-        headers.add(name: "content-type", value: "application/json")
-        if let token = sessionToken {
-            headers.add(name: "authorization", value: "Bearer \(token)")
-        }
-        let request: HTTPClient.Request
-        do {
-            request = try HTTPClient.Request(url: url, method: method, headers: headers)
-        } catch {
-            return self.eventLoopGroup.next().makeFailedFuture(error)
-        }
-        return self.execute(request: request)
+        executeRequest(to: url, method: method, sessionToken: sessionToken, logger: logger)
     }
     
     public func sendRequest<T>(to url: String, method: HTTPMethod, data: T, sessionToken: String?, basicAuth: BasicAuthCredentials?, logger: Logger) -> EventLoopFuture<Response> where T : Encodable {
+        let body: Body
+        do {
+            let bodyData = try JSONEncoder().encodeAsByteBuffer(data, allocator: ByteBufferAllocator())
+            body = Body.byteBuffer(bodyData)
+        } catch {
+            return self.eventLoopGroup.next().makeFailedFuture(error)
+        }
+        return executeRequest(to: url, method: method, sessionToken: sessionToken, basicAuth: basicAuth, body: body, logger: logger)
+    }
+    
+    func executeRequest(to url: String, method: HTTPMethod, sessionToken: String?, basicAuth: BasicAuthCredentials? = nil, body: Body? = nil, logger: Logger) -> EventLoopFuture<Response> {
         logger.trace("FILEMAKERNIO - will send request to \(url)")
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
@@ -36,8 +35,7 @@ extension HTTPClient: Client {
         }
         let request: HTTPClient.Request
         do {
-            let body = try JSONEncoder().encodeAsByteBuffer(data, allocator: ByteBufferAllocator())
-            request = try HTTPClient.Request(url: url, method: method, headers: headers, body: Body.byteBuffer(body))
+            request = try HTTPClient.Request(url: url, method: method, headers: headers, body: body)
             logger.trace("FILEMAKERNIO - Sending request \(request)")
         } catch {
             return self.eventLoopGroup.next().makeFailedFuture(error)

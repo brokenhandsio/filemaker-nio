@@ -7,6 +7,7 @@ import Logging
 extension HTTPClient: Client {
     
     public func sendRequest(to url: String, method: HTTPMethod, sessionToken: String?, logger: Logger) -> EventLoopFuture<Response> {
+        logger.trace("FILEMAKERNIO - will send request to \(url)")
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
         if let token = sessionToken {
@@ -22,6 +23,7 @@ extension HTTPClient: Client {
     }
     
     public func sendRequest<T>(to url: String, method: HTTPMethod, data: T, sessionToken: String?, basicAuth: BasicAuthCredentials?, logger: Logger) -> EventLoopFuture<Response> where T : Encodable {
+        logger.trace("FILEMAKERNIO - will send request to \(url)")
         var headers = HTTPHeaders()
         headers.add(name: "content-type", value: "application/json")
         if let token = sessionToken {

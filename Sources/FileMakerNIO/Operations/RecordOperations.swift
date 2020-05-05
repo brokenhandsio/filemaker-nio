@@ -35,8 +35,8 @@ public extension FileMakerNIO {
         }
     }
     
-    func getRecords<T>(layout: String, decodeTo type: T, offset: Int?, limit: Int?) -> EventLoopFuture<[T]> where T: Codable {
-        var url  = "https://\(self.configuration.hostname)/fmi/data/version/databases/\(self.configuration.databaseName)/layouts/\(layout)/records"
+    func getRecords<T>(layout: String, decodeTo type: T.Type, offset: Int? = nil, limit: Int? = nil) -> EventLoopFuture<[T]> where T: Codable {
+        var url  = "\(self.layoutsURL)\(layout)/records"
         if offset != nil || limit != nil {
             url += "?"
         }
@@ -55,7 +55,7 @@ public extension FileMakerNIO {
     }
     
     func findRecords<T, R>(layout: String, payload:T, decodeTo type: R) -> EventLoopFuture<[R]> where T: Codable, R: Codable {
-        let url = "https://\(self.configuration.hostname)/fmi/data/version/databases/\(self.configuration.databaseName)/layouts/\(layout)/_find"
+        let url = "\(self.layoutsURL)\(layout)/_find"
         return self.performOperation(url: url, data: payload, type: FindRecordsResponse<R>.self).map { findResponse in
             findResponse.data
         }

@@ -17,9 +17,9 @@ public extension FileMakerNIO {
         }
     }
     
-    func editRecord<T>(_ id: Int, layout: String, data: T) -> EventLoopFuture<EditRecordResponse> where T: Encodable {
+    func editRecord<T>(_ id: Int, layout: String, updateData: T) -> EventLoopFuture<EditRecordResponse> where T: Codable {
         let url = "\(self.layoutsURL)\(layout)/records/\(id)"
-        return self.performOperation(url: url, data: data, type: EditRecordResponse.self)
+        return self.performOperation(url: url, data: updateData, type: EditRecordResponse.self)
     }
     
     func duplicateRecord<T>(_ id: Int, layout: String, decodeTo type: T.Type) -> EventLoopFuture<DuplicateRecordResponse> where T: Encodable {

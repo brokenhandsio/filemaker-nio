@@ -11,8 +11,8 @@ public extension FileMakerNIO {
         let url = "\(self.layoutsURL)\(layout)/records"
         let createData = CreateRecordRequest(fieldData: data)
         return self.performOperation(url: url, data: createData, type: CreateRecordResponse.self).map { response in
-            data.modId = Int(response.modId)
-            data.recordId = Int(response.recordId)
+            data.modId = response.modId
+            data.recordId = response.recordId
             return data
         }
     }
@@ -32,7 +32,7 @@ public extension FileMakerNIO {
         return self.performOperation(url: url, type: DeleteRecordResponse.self).map { _ in }
     }
     
-    func getRecord<T>(_ id: Int, layout: String, decodeTo type: T) -> EventLoopFuture<T> where  T: Codable {
+    func getRecord<T>(_ id: Int, layout: String, decodeTo type: T.Type) -> EventLoopFuture<T> where  T: Codable {
         let url = "\(self.layoutsURL)\(layout)/records/\(id)"
         return self.performOperation(url: url, type: GetRecordResponse<T>.self).map { getRecordResponse in
             getRecordResponse.data
@@ -54,7 +54,7 @@ public extension FileMakerNIO {
             url += "_limit=\(limit)"
         }
         return self.performOperation(url: url, type: GetRangeOfRecordsResponse<T>.self).map { getRangeOfRecordsResponse in
-            getRangeOfRecordsResponse.data
+            getRangeOfRecordsResponse.data.map { $0.fieldData }
         }
     }
     

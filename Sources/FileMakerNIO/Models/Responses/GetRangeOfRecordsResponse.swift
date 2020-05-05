@@ -7,5 +7,11 @@ public struct GetRangeOfRecordsResponse<T: Codable>: CodableAction {
     static var action: String {
         "get range of records"
     }
-    let data: [T]
+    let data: [GetRangeOfRecordsData<T>]
+}
+
+public struct GetRangeOfRecordsData<T: Codable>: Codable {
+    let recordId: String
+    let modId: String
+    let fieldData: T
 }

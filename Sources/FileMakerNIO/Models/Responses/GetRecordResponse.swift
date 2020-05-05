@@ -1,7 +1,7 @@
 import NIOHTTP1
 import Foundation
 
-struct GetRecordResponse<T: Codable>: CodableAction {
+struct GetRecordResponse<T: FMIdentifiable>: CodableAction {
     static var method: HTTPMethod {
         .GET
     }

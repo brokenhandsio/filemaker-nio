@@ -1,6 +1,6 @@
 import NIOHTTP1
 
-public struct FindRecordsResponse<T: Codable>: CodableAction {
+public struct FindRecordsResponse<T: FMIdentifiable>: CodableAction {
     static var method: HTTPMethod {
         .POST
     }

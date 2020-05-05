@@ -1,6 +1,6 @@
 import NIOHTTP1
 
-public struct GetRangeOfRecordsResponse<T: Codable>: CodableAction {
+public struct GetRangeOfRecordsResponse<T: FMIdentifiable>: CodableAction {
     static var method: HTTPMethod {
         .GET
     }

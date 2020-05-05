@@ -1,6 +1,6 @@
 import Foundation
 
 public protocol FMIdentifiable: class, Codable {
-    var recordId: String? { get set }
-    var modId: String? { get set }
+    var recordId: Int? { get set }
+    var modId: Int? { get set }
 }

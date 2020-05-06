@@ -14,7 +14,13 @@ extension FileMakerNIO {
         return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMap { response in
             guard response.status != .unauthorized else {
                 return self.start().flatMap {
-                    self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMapThrowing { response in
+                    let updatedToken: String
+                    do {
+                        updatedToken = try self.getToken()
+                    } catch {
+                        return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                    }
+                    return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: updatedToken, basicAuth: nil, logger: self.logger).flatMapThrowing { response in
                         try self.validateAndGetResponse(response, type: type)
                     }
                 }
@@ -38,7 +44,13 @@ extension FileMakerNIO {
         return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMap { response in
             guard response.status != .unauthorized else {
                 return self.start().flatMap {
-                    self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMapThrowing { response in
+                    let updatedToken: String
+                    do {
+                        updatedToken = try self.getToken()
+                    } catch {
+                        return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                    }
+                    return self.client.sendRequest(to: url, method: type.method, sessionToken: updatedToken, logger: self.logger).flatMapThrowing { response in
                         try self.validateAndGetResponse(response, type: type)
                     }
                 }

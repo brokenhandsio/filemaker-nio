@@ -9,10 +9,10 @@ struct FilemakerAuthentication {
     let configuration: FileMakerConfiguration
     let baseURL: String
     
-    func login() -> EventLoopFuture<LoginResponse> {
+    func login(on eventLoop: EventLoop) -> EventLoopFuture<LoginResponse> {
         let url = "\(baseURL)sessions"
         logger.trace("FILEMAKERNIO - attempting login to \(url)")
-        return client.sendRequest(to: url, method: .POST, data: EmptyRequest(), sessionToken: nil, basicAuth: .init(username: configuration.username, password: configuration.password), logger: self.logger).flatMapThrowing { response in
+        return client.sendRequest(to: url, method: .POST, data: EmptyRequest(), sessionToken: nil, basicAuth: .init(username: configuration.username, password: configuration.password), logger: self.logger, eventLoop: eventLoop).flatMapThrowing { response in
             guard response.status == .ok else {
                 if response.status == .unauthorized {
                     throw FileMakerNIOError(message: "The username or password was incorrect")
@@ -29,9 +29,9 @@ struct FilemakerAuthentication {
         }
     }
     
-    func logout(token: String) -> EventLoopFuture<Void> {
+    func logout(token: String, on eventLoop: EventLoop) -> EventLoopFuture<Void> {
         let url = "\(baseURL)sessions/\(token)"
-        return client.sendRequest(to: url, method: .DELETE, sessionToken: nil, logger: self.logger).flatMapThrowing { response in
+        return client.sendRequest(to: url, method: .DELETE, sessionToken: nil, logger: self.logger, eventLoop: eventLoop).flatMapThrowing { response in
             guard response.status == .ok else {
                 throw FileMakerNIOError(message: "Failed to log out of database")
             }

@@ -4,62 +4,62 @@ import AsyncHTTPClient
 
 extension FileMakerNIO {
     
-    internal func performOperation<T, R>(url: String, data: T, type: R.Type) -> EventLoopFuture<R> where T: Encodable, R: CodableAction {
+    internal func performOperation<T, R>(url: String, data: T, type: R.Type, on eventLoop: EventLoop) -> EventLoopFuture<R> where T: Encodable, R: CodableAction {
         let token: String
         do {
             token = try self.getToken()
         } catch {
-            return self.client.eventLoopGroup.next().makeFailedFuture(error)
+            return eventLoop.makeFailedFuture(error)
         }
-        return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger).flatMap { response in
+        return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: token, basicAuth: nil, logger: self.logger, eventLoop: eventLoop).flatMap { response in
             guard response.status != .unauthorized else {
-                return self.start().flatMap {
+                return self.start(on: eventLoop).flatMap {
                     let updatedToken: String
                     do {
                         updatedToken = try self.getToken()
                     } catch {
-                        return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                        return eventLoop.makeFailedFuture(error)
                     }
-                    return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: updatedToken, basicAuth: nil, logger: self.logger).flatMapThrowing { response in
+                    return self.client.sendRequest(to: url, method: type.method, data: data, sessionToken: updatedToken, basicAuth: nil, logger: self.logger, eventLoop: eventLoop).flatMapThrowing { response in
                         try self.validateAndGetResponse(response, type: type)
                     }
                 }
             }
             do {
                 let result = try self.validateAndGetResponse(response, type: type)
-                return self.client.eventLoopGroup.next().makeSucceededFuture(result)
+                return eventLoop.makeSucceededFuture(result)
             } catch {
-                return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                return eventLoop.makeFailedFuture(error)
             }
         }
     }
     
-    internal func performOperation<R>(url: String, type: R.Type) -> EventLoopFuture<R> where R: CodableAction {
+    internal func performOperation<R>(url: String, type: R.Type, on eventLoop: EventLoop) -> EventLoopFuture<R> where R: CodableAction {
         let token: String
         do {
             token = try self.getToken()
         } catch {
-            return self.client.eventLoopGroup.next().makeFailedFuture(error)
+            return eventLoop.makeFailedFuture(error)
         }
-        return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger).flatMap { response in
+        return self.client.sendRequest(to: url, method: type.method, sessionToken: token, logger: self.logger, eventLoop: eventLoop).flatMap { response in
             guard response.status != .unauthorized else {
-                return self.start().flatMap {
+                return self.start(on: eventLoop).flatMap {
                     let updatedToken: String
                     do {
                         updatedToken = try self.getToken()
                     } catch {
-                        return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                        return eventLoop.makeFailedFuture(error)
                     }
-                    return self.client.sendRequest(to: url, method: type.method, sessionToken: updatedToken, logger: self.logger).flatMapThrowing { response in
+                    return self.client.sendRequest(to: url, method: type.method, sessionToken: updatedToken, logger: self.logger, eventLoop: eventLoop).flatMapThrowing { response in
                         try self.validateAndGetResponse(response, type: type)
                     }
                 }
             }
             do {
                 let result = try self.validateAndGetResponse(response, type: type)
-                return self.client.eventLoopGroup.next().makeSucceededFuture(result)
+                return eventLoop.makeSucceededFuture(result)
             } catch {
-                return self.client.eventLoopGroup.next().makeFailedFuture(error)
+                return eventLoop.makeFailedFuture(error)
             }
         }
     }

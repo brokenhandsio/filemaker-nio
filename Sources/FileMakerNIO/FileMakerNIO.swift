@@ -26,14 +26,14 @@ public class FileMakerNIO {
         return token
     }
     
-    public func start() -> EventLoopFuture<Void> {
+    public func start(on eventLoop: EventLoop) -> EventLoopFuture<Void> {
         let authentication = FilemakerAuthentication(client: self.client, logger: self.logger, configuration: self.configuration, baseURL: self.apiBaseURL)
-        return authentication.login().map { loginResponse in
+        return authentication.login(on: eventLoop).map { loginResponse in
             self.token = loginResponse.response.token
         }
     }
     
-    public func stop() -> EventLoopFuture<Void> {
+    public func stop(on eventLoop: EventLoop) -> EventLoopFuture<Void> {
         let authentication = FilemakerAuthentication(client: self.client, logger: self.logger, configuration: self.configuration, baseURL: self.apiBaseURL)
         let token: String
         do {
@@ -41,7 +41,7 @@ public class FileMakerNIO {
         } catch {
             return self.client.eventLoopGroup.next().makeFailedFuture(error)
         }
-        return authentication.logout(token: token)
+        return authentication.logout(token: token, on: eventLoop)
     }
     
 }

@@ -39,7 +39,7 @@ public class FileMakerNIO {
         do {
             token = try getToken()
         } catch {
-            return self.client.eventLoopGroup.next().makeFailedFuture(error)
+            return eventLoop.makeFailedFuture(error)
         }
         return authentication.logout(token: token, on: eventLoop)
     }

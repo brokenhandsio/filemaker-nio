@@ -32,10 +32,5 @@ public final class FMInt: Codable {
         var container = encoder.singleValueContainer()
         try container.encode(self.wrappedValue)
     }
-
-    public func decode(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.wrappedValue = try container.decode(Int.self)
-    }
 }
 

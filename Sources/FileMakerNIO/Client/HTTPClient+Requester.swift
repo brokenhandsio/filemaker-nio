@@ -14,6 +14,8 @@ extension HTTPClient: Client {
         let body: Body
         do {
             let bodyData = try JSONEncoder().encodeAsByteBuffer(data, allocator: ByteBufferAllocator())
+            let bodyString = String(decoding: bodyData.readableBytesView, as: UTF8.self)
+            logger.trace("FILEMAKERNIO - Request will be: \(bodyString)")
             body = Body.byteBuffer(bodyData)
         } catch {
             return eventLoop.makeFailedFuture(error)
